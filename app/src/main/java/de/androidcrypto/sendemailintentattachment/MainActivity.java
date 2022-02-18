@@ -103,10 +103,24 @@ public class MainActivity extends AppCompatActivity {
                         }
                         emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, message);
                         System.out.println("before MainActivity.this.startActivity");
+
+                        // new no further error
+                        // source: https://stackoverflow.com/a/59439316/8166854
+                        Intent chooser = Intent.createChooser(emailIntent, "Share File");
+                        List<ResolveInfo> resInfoList = MainActivity.this.getPackageManager().queryIntentActivities(chooser, PackageManager.MATCH_DEFAULT_ONLY);
+                        for (ResolveInfo resolveInfo : resInfoList) {
+                            String packageName = resolveInfo.activityInfo.packageName;
+                            MainActivity.this.grantUriPermission(packageName, contentUri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        }
+                        startActivity(chooser);
+
+                        /*
+                        // old does work but throws an error
                         if (emailIntent.resolveActivity(getPackageManager()) != null) {
                             //startActivity(intent);
                             MainActivity.this.startActivity(Intent.createChooser(emailIntent, "Sending email..."));
                         }
+                         */
 
                         System.out.println("after MainActivity.this.startActivity");
                     } catch (SecurityException e) {
